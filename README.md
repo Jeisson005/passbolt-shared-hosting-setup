@@ -219,3 +219,10 @@ By implementing these steps, the update process can be streamlined and made more
 
 - [Passbolt Documentation](https://www.passbolt.com/docs)
 - [Passbolt Community Forum](https://community.passbolt.com/)
+
+## License
+
+This repository is dual-licensed:
+
+- **MIT License** – all original files (Dockerfile, compose, scripts, README, etc.).
+- **GNU AGPL v3** – `passbolt.default.php` (copied from Passbolt CE). See the header inside that file for details.
