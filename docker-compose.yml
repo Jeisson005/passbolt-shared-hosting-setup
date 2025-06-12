@@ -1,0 +1,15 @@
+services:
+  passbolt:
+    image: passbolt_setup
+    container_name: passbolt_setup
+    build: 
+      context: .
+      args:
+        NAME_REAL: ${NAME_REAL}
+        NAME_EMAIL: ${NAME_EMAIL}
+    ports:
+      - "80:80"
+    tty: true
+    volumes:
+      - ./html:/output
+      - ./gnupg:/gnupg

@@ -1,0 +1,6 @@
+# Ignore local environment file
+.env
+passbolt.php
+html/*
+gnupg/*
+html.zip
