@@ -9,7 +9,7 @@ RUN apt-get update && \
     php-mysql php-pdo \
     php-xsl php-curl \
     php-ldap php-memcached \
-    libapache2-mod-php unzip && \
+    libapache2-mod-php unzip rsync && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     chmod +x /usr/local/bin/composer && \
@@ -102,8 +102,9 @@ RUN chmod ugo+w -R /var/www/html/tmp/ && \
     chmod ugo-w -R /var/www/html/config/jwt/ && \
     chown -R www-data:www-data /var/www/html/config/jwt
 
-# Create output directory for manual copy by user
+# Create output directories for manual copy by user
 RUN mkdir -p /output
+RUN mkdir -p /gnupg
 
 # Expose port 80
 EXPOSE 80

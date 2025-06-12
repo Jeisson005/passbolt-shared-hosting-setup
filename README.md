@@ -91,23 +91,19 @@ docker compose run --build --rm --service-ports passbolt bash
 
 ### 5. Copy Installation Files
 
-Copy the Passbolt installation files to the output directory for later upload, excluding `.github` and `.gitlab-ci` directories:
+Copy the Passbolt installation files to the output directory for later upload, excluding `.github`, `.gitlab-ci`, and `.git` directories:
 ```bash
-rsync -av --exclude='.github' --exclude='.gitlab-ci' /var/www/html/ /output/
+rsync -av --exclude='.github' --exclude='.gitlab-ci' --exclude='.git' /var/www/html/ /output/
 ```
 
 ### 6. Backup GnuPG Keys
 
 Before proceeding, create a backup of the GnuPG keys generated during the installation. These keys are critical for the security of your Passbolt instance.
 
-1. Create a directory named `gnupg`:
-   ```bash
-   mkdir /gnupg
-   ```
-2. Copy all contents, including hidden files, from `/var/www/.gnupg/` to the newly created `gnupg` folder:
-   ```bash
-   rsync -av --include='.*' /var/www/.gnupg/ /gnupg/
-   ```
+Copy all contents, including hidden files, from `/var/www/.gnupg/` to the newly created `gnupg` folder:
+```bash
+rsync -av --include='.*' /var/www/.gnupg/ /gnupg/
+```
 
 **Important**: Store the `gnupg` folder and its contents securely. These files contain the private and public keys required for Passbolt to function correctly. Unauthorized access to these keys can compromise the security of your Passbolt instance.
 
