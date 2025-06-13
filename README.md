@@ -146,8 +146,16 @@ zip -r html.zip html
        'fullBaseUrl' => 'https://your-hosting-url.com',
    ],
    ```
-3. Upload these files to your shared hosting environment.
-4. Configure a cron job to execute `bin/cron` within the Passbolt directory. This is necessary for tasks like sending emails. As an example, the `cron_hostinger.sh` script demonstrates how to set up a cron job for a specific hosting provider. The cron job command for this script might look like this:
+3. In the same `config/passbolt.php` file, ensure that SSL is enforced by setting:
+   ```php
+   'passbolt' => [
+       'ssl' => [
+           'force' => true,
+       ],
+   ],
+   ```
+4. Upload these files to your shared hosting environment.
+5. Configure a cron job to execute `bin/cron` within the Passbolt directory. This is necessary for tasks like sending emails. As an example, the `cron_hostinger.sh` script demonstrates how to set up a cron job for a specific hosting provider. The cron job command for this script might look like this:
    ```bash
    * * * * * /bin/bash /path/to/passbolt/cron_hostinger.sh
    ```
