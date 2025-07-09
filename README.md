@@ -186,12 +186,33 @@ After uploading the files to your shared hosting environment, ensure the followi
      ```
 
 3. **Executable Files**:
-   - The `cron_hostinger.sh` script must have execution permissions. Use the following command to set it:
+   - If you used the `cron_hostinger.sh` script, ensure it has execution permissions by running:
      ```bash
      chmod +x /path/to/passbolt/cron_hostinger.sh
      ```
 
-By setting these permissions, you ensure that your Passbolt installation remains secure and functions as expected.
+### 12. (Optional) Address Hosting Time Offset Issues
+
+In some cases, the hosting server's clock may be offset by several seconds or even minutes from the correct time. This can cause synchronization issues between the client and server, particularly in the mobile application, preventing successful login attempts.
+
+To resolve this issue, follow these steps:
+
+1. **Upload the `cron_time_offset.php` File**:
+   - Place the `cron_time_offset.php` file in the Passbolt directory.
+
+2. **Set Execution Permissions**:
+   - Ensure the script has execution permissions by running:
+     ```bash
+     chmod +x /path/to/passbolt/cron_time_offset_hostinger.sh
+     ```
+
+3. **Configure a Cron Job**:
+   - Set up a cron job to execute the PHP script frequently (recommended every hour or every minute). For example, on Hostinger, you can upload and configure the `cron_time_offset_hostinger.sh` script as follows:
+     ```bash
+     * * * * * /bin/bash /path/to/passbolt/cron_time_offset_hostinger.sh
+     ```
+
+By implementing these steps, you can mitigate time synchronization issues and ensure proper functionality of the Passbolt instance.
 
 ## Roadmap
 
