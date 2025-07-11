@@ -1,9 +1,10 @@
 services:
-  passbolt:
+  passbolt_setup:
     image: passbolt_setup
     container_name: passbolt_setup
     build: 
       context: .
+      dockerfile: Dockerfile.setup
       args:
         NAME_REAL: ${NAME_REAL}
         NAME_EMAIL: ${NAME_EMAIL}
@@ -13,3 +14,14 @@ services:
     volumes:
       - ./html:/output
       - ./gnupg:/gnupg
+  passbolt_update:
+    image: passbolt_update
+    container_name: passbolt_update
+    build: 
+      context: .
+      dockerfile: Dockerfile.update
+    ports:
+      - "80:80"
+    tty: true
+    volumes:
+      - ./html:/output

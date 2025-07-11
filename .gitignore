@@ -1,6 +1,5 @@
 # Ignore local environment file
 .env
 passbolt.php
-html/*
+html*
 gnupg*
-html.zip

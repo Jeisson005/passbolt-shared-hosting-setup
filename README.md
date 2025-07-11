@@ -55,7 +55,7 @@ Follow these steps to set up Passbolt locally:
 
 Run the container using Docker Compose:
 ```bash
-docker compose run --build --rm --service-ports passbolt bash
+docker compose run --build --rm --service-ports passbolt_setup bash
 ```
 
 ### 4. Install Passbolt Inside the Container
@@ -82,7 +82,8 @@ docker compose run --build --rm --service-ports passbolt bash
    Note: During the health check, you might encounter the following warnings:
    - `[FAIL] Passbolt is not configured to force SSL use.`
    - `[FAIL] App.fullBaseUrl is not set to HTTPS.`
-   These warnings occur because the application is running locally without SSL.
+   - `[WARN] System clock and NTP service information cannot be found.`
+   These warnings occur because the application is running locally without SSL and because the Docker container does not have NTP configured for time synchronization.
 
 5. Exit the `www-data` user session to switch back to the root user:
    ```bash
@@ -233,29 +234,9 @@ To resolve this issue, follow these steps:
 
 By implementing these steps, you can mitigate time synchronization issues and ensure proper functionality of the Passbolt instance.
 
-## Roadmap
+## Updates
 
-### Update Management
-
-Currently, this setup does not include a clear process for managing updates to the Passbolt instance. Updates are critical to ensure security and access to the latest features. Below is a brief outline of how update management could be approached:
-
-1. **Backup Before Updates**:
-   - Regularly back up the `html` and `gnupg` directories.
-   - Ensure the database is also backed up.
-
-2. **Update Process**:
-   - Pull the latest version of Passbolt from the official repository.
-   - Rebuild the Docker container with the updated source code.
-   - Test the updated instance locally before deploying to the shared hosting environment.
-
-3. **Deployment**:
-   - Replace the existing files on the shared hosting with the updated files.
-   - Verify the application functionality post-deployment.
-
-4. **Automation**:
-   - Consider scripting the update process to reduce manual effort and minimize errors.
-
-By implementing these steps, the update process can be streamlined and made more secure.
+For detailed instructions on how to update your Passbolt instance, please refer to the [Update Guide](UPDATE.md).
 
 ---
 

@@ -26,6 +26,14 @@ RUN mkdir -p /var/www /var/log/apache2 /var/run && \
 # Enable Apache modules (mod_rewrite)
 RUN a2enmod rewrite
 
+# Allow Apache to read Passbolt's .htaccess
+RUN printf '<Directory "/var/www/html">\n\
+    Options +FollowSymLinks -MultiViews\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>\n' > /etc/apache2/conf-available/passbolt.conf \
+ && a2enconf passbolt
+
 # Create passbolt-tmp folder in the home directory of www-data user
 RUN mkdir -p /passbolt-tmp && chown www-data:www-data /passbolt-tmp
 
@@ -43,8 +51,8 @@ RUN cd /var/www/passbolt && composer install --no-dev && \
 ARG NAME_REAL
 ARG NAME_EMAIL
 
-# Switch to www-data user to generate the GPG key using build arguments
 USER www-data
+# Switch to www-data user to generate the GPG key using build arguments
 RUN gpg --batch --no-tty --gen-key <<EOF
 Key-Type: rsa
 Key-Length: 4096
@@ -71,13 +79,13 @@ RUN mkdir -p /var/www/passbolt/config/gpg && \
     gpg --list-keys --fingerprint | grep -i -B 2 "${NAME_EMAIL}" > /passbolt-tmp/fingerprint.txt
 
 USER root
+# Create the JWT keys for Passbolt
 RUN /var/www/passbolt/bin/cake passbolt create_jwt_keys && \
     chmod 600 /var/www/passbolt/config/jwt/jwt.key && \
     chmod 640 /var/www/passbolt/config/jwt/jwt.pem && \
     chmod 750 /var/www/passbolt/config/jwt
 
 # Copy the custom Passbolt configuration file
-USER root
 COPY passbolt.php /var/www/passbolt/config/passbolt.php
 
 # Extract the fingerprint from the second line of the file and replace the placeholder
@@ -88,14 +96,6 @@ RUN FINGERPRINT=$(sed -n '2p' /passbolt-tmp/fingerprint.txt | tr -d ' ') && \
 # Rename Passbolt to html replacing the original html
 RUN if [ -d /var/www/html ]; then mv /var/www/html /var/www/html_old; fi && \
     mv /var/www/passbolt /var/www/html
-
-# Allow Apache to read Passbolt's .htaccess
-RUN printf '<Directory "/var/www/html">\n\
-    Options +FollowSymLinks -MultiViews\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>\n' > /etc/apache2/conf-available/passbolt.conf \
- && a2enconf passbolt
 
 # Set permissions for Passbolt
 RUN chmod ugo+w -R /var/www/html/tmp/ && \
@@ -110,5 +110,4 @@ RUN mkdir -p /gnupg
 EXPOSE 80
 
 # Default command to start Apache in the foreground
-USER root
 CMD ["apache2ctl", "-D", "FOREGROUND"]

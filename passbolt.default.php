@@ -114,7 +114,7 @@ return [
             // Main server key.
             'serverKey' => [
                 // Server private key fingerprint.
-                'fingerprint' => '',
+                'fingerprint' => 'GPG_FINGERPRINT_PLACEHOLDER_TO_BE_REPLACED',
                 //'public' => CONFIG . 'gpg' . DS . 'serverkey.asc',
                 //'private' => CONFIG . 'gpg' . DS . 'serverkey_private.asc',
             ],

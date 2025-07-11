@@ -1,0 +1,70 @@
+FROM ubuntu:latest
+
+# Install apache2, git, gnupg, PHP, Composer, and necessary dependencies
+RUN apt-get update && \
+    apt-get install -y curl apache2 git gnupg \
+    php php-cli php-fpm \
+    php-gnupg php-intl php-mbstring php-xml \
+    php-gd php-imagick \
+    php-mysql php-pdo \
+    php-xsl php-curl \
+    php-ldap php-memcached \
+    libapache2-mod-php unzip rsync && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    chmod +x /usr/local/bin/composer && \
+    ln -sf /usr/local/bin/composer /usr/bin/composer
+
+# Create the www-data user if it doesn't exist and set proper permissions
+RUN echo "/bin/bash" >> /etc/shells && \
+    useradd -m -d /var/www -s /bin/bash www-data || usermod -d /var/www -s /bin/bash www-data
+
+# Set proper permissions for apache
+RUN mkdir -p /var/www /var/log/apache2 /var/run && \
+    chown -R www-data:www-data /var/www /var/log/apache2 /var/run
+
+# Enable Apache modules (mod_rewrite)
+RUN a2enmod rewrite
+
+# Allow Apache to read Passbolt's .htaccess
+RUN printf '<Directory "/var/www/html">\n\
+    Options +FollowSymLinks -MultiViews\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>\n' > /etc/apache2/conf-available/passbolt.conf \
+ && a2enconf passbolt
+
+# Copy passbolt files
+RUN rm -f /var/www/html/index.html
+COPY ./html/ /var/www/html/
+RUN chown -R www-data:www-data /var/www/html
+WORKDIR /var/www/html
+
+USER www-data
+# Get the latest Passbolt version
+RUN git init && git remote add origin https://github.com/passbolt/passbolt_api.git && \
+    git fetch origin && \
+    git checkout -b master origin/master --force && \
+    git pull origin master
+
+# Install Passbolt dependencies with Composer
+RUN composer install --no-dev -n -o
+
+USER root
+# Copy gnupg keys
+COPY ./gnupg/ /var/www/.gnupg/
+RUN chown -R www-data:www-data /var/www/.gnupg/
+
+# Set permissions for Passbolt
+RUN chmod 600 /var/www/html/config/jwt/jwt.key && \
+    chmod 640 /var/www/html/config/jwt/jwt.pem && \
+    chmod 750 /var/www/html/config/jwt
+RUN chmod ugo+w -R /var/www/html/tmp/ && \
+    chmod ugo-w -R /var/www/html/config/jwt/ && \
+    chown -R www-data:www-data /var/www/html/config/jwt
+
+# Expose port 80
+EXPOSE 80
+
+# Default command to start Apache in the foreground
+CMD ["apache2ctl", "-D", "FOREGROUND"]
